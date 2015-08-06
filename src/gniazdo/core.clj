@@ -1,5 +1,5 @@
 (ns gniazdo.core
-  (:import java.net.URI
+  (:import (java.net HttpCookie URI)
            java.nio.ByteBuffer
            java.util.List
            (org.eclipse.jetty.websocket.client ClientUpgradeRequest
@@ -61,10 +61,19 @@
   (when (seq subprotocols)
     (.setSubProtocols request ^List (into () subprotocols))))
 
+(defn- add-cookies!
+  [^ClientUpgradeRequest request cookies]
+  (when (seq cookies)
+    (.setCookies request
+      (map (fn [{:keys [name value]}]
+             (HttpCookie. name value))
+        cookies))))
+
 (defn- upgrade-request
   ^ClientUpgradeRequest
-  [{:keys [headers subprotocols]}]
+  [{:keys [cookies headers subprotocols]}]
   (doto (ClientUpgradeRequest.)
+    (add-cookies! cookies)
     (add-headers! headers)
     (add-subprotocols! subprotocols)))
 
