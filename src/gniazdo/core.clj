@@ -37,7 +37,9 @@
   (send-msg [this msg]
     "Sends a message (implementing `gniazdo.core/Sendable`) to the given WebSocket.")
   (close [this]
-    "Closes the WebSocket."))
+    "Closes the WebSocket.")
+  (session [this]
+    "Returns the underlying websocket session"))
 
 ;; ## WebSocket Helpers
 
@@ -135,6 +137,8 @@
        (reify Client
          (send-msg [_ msg]
            (send-to-endpoint msg (.getRemote session)))
+         (session [_]
+           session)
          (close [_]
            (when cleanup
              (cleanup))
